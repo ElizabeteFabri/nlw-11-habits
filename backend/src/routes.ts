@@ -65,7 +65,7 @@ export async function appRoutes(app: FastifyInstance) {
 
     const completedHabits = day?.dayHabits.map(dayHabit => {
       return dayHabit.habit_id
-    })
+    }) ?? []
 
     return {
       possibleHabits,
@@ -87,7 +87,7 @@ export async function appRoutes(app: FastifyInstance) {
         date: today
       }
     })
-    //PASSANDO INFORMAÇAO PARA O BANCO DE DADOS
+
     if(!day) {
       day = await prisma.day.create({
         data: {
@@ -95,7 +95,7 @@ export async function appRoutes(app: FastifyInstance) {
         }
       })
     }
-    //BUSCANDO UM REGISTRO NO BANCO DE DADOS NA TABELA DAYHABIT
+
     const dayHabit = await prisma.dayHabit.findUnique({
       where: {
         day_id_habit_id: {
@@ -104,7 +104,7 @@ export async function appRoutes(app: FastifyInstance) {
         }
       }
     })
-    //REMOVENDO O REGISTRO
+
     if(dayHabit) {
       await prisma.dayHabit.delete({
         where: {
@@ -122,7 +122,6 @@ export async function appRoutes(app: FastifyInstance) {
   })
 
   app.get('/summary', async () => {
-    //QUERO QUE RETORNE UM ARRAY COM UMA LISTA SENDO UM OBJ: DATA, DIA E QTOS HABITOS ERAM POSSIVEIS SEREM COMPLETOS NO DIA.
     const summary = await prisma.$queryRaw`
       SELECT 
         D.id, 
